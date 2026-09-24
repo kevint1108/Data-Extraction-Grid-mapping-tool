@@ -7,7 +7,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 
 from fetcher import load_html
-from grid import render
+from grid import build_grid, render
 from grid_parser import parse_html
 
 
@@ -62,7 +62,7 @@ class handler(BaseHTTPRequestHandler):
 
         fill = query.get("fill", [" "])[0]
         try:
-            grid = parse_html(load_html(source))
+            grid = build_grid(parse_html(load_html(source)))
             result = render(grid, origin=origin, fill=fill)
         except requests.HTTPError as error:
             status = error.response.status_code if error.response is not None else 502
