@@ -43,6 +43,14 @@ python main.py <source> --fill .          # show empty cells as dots
 python main.py <source> -v                # enable detailed logging
 ```
 
+To run the standalone local web server:
+
+```bash
+python server.py
+```
+
+Then open `http://127.0.0.1:8000` and submit the published Google Docs URL.
+
 Alternatively, press **F5** in VS Code and select the *Grid Decoder: Enter URL* configuration.
 
 Use it as a library:
