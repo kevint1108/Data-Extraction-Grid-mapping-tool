@@ -1,0 +1,46 @@
+from __future__ import annotations
+
+import json
+from http.server import BaseHTTPRequestHandler
+from urllib.parse import parse_qs, urlparse
+
+from fetcher import load_html
+from grid import render
+from grid_parser import parse_html
+
+
+def _response(handler: BaseHTTPRequestHandler, status: int, body: str) -> None:
+    payload = body.encode("utf-8")
+    handler.send_response(status)
+    handler.send_header("Content-Type", "text/plain; charset=utf-8")
+    handler.send_header("Content-Length", str(len(payload)))
+    handler.send_header("Access-Control-Allow-Origin", "*")
+    handler.end_headers()
+    handler.wfile.write(payload)
+
+
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self) -> None:
+        query = parse_qs(urlparse(self.path).query)
+        source = query.get("source", [""])[0]
+        if not source:
+            _response(self, 400, "Missing required query parameter: source\n")
+            return
+        if not source.startswith(("http://", "https://")):
+            _response(self, 400, "source must be an HTTP or HTTPS URL\n")
+            return
+
+        origin = query.get("origin", ["bottom"])[0]
+        if origin not in {"bottom", "top"}:
+            _response(self, 400, "origin must be 'bottom' or 'top'\n")
+            return
+
+        fill = query.get("fill", [" "])[0]
+        try:
+            grid = parse_html(load_html(source))
+            result = render(grid, origin=origin, fill=fill)
+        except Exception as error:
+            _response(self, 502, json.dumps({"error": str(error)}) + "\n")
+            return
+
+        _response(self, 200, result + "\n")

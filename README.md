@@ -52,6 +52,17 @@ from main import decode
 decode("https://docs.google.com/document/d/e/XXXX/pub")
 ```
 
+## Vercel Deployment
+
+The repository includes a Vercel serverless function at `/api/index.py`. Deploy the
+repository to Vercel, then call it with a published document URL:
+
+```text
+https://your-project.vercel.app/api?source=https%3A%2F%2Fdocs.google.com%2Fdocument%2Fd%2Fe%2FXXXX%2Fpub
+```
+
+Optional query parameters are `origin=top` or `origin=bottom` and `fill=.`.
+
 ## Testing
 
 ```bash
