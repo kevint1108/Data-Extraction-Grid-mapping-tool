@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Grid Decoder: sample F",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["samples/sample_F.html", "-v"],
+      "cwd": "${workspaceFolder}", "console": "integratedTerminal"
+    },
+    {
+      "name": "Grid Decoder: nhập URL",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["${input:docUrl}", "-o", "output/grid.txt"],
+      "cwd": "${workspaceFolder}", "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    { "id": "docUrl", "type": "promptString", "description": "URL Google Docs hoặc đường dẫn file HTML" }
+  ]
+}
