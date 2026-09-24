@@ -76,7 +76,16 @@ class handler(BaseHTTPRequestHandler):
                 _response(self, 502, f"Unable to fetch source URL (HTTP {status}).\n")
             return
         except Exception as error:
-            _response(self, 502, json.dumps({"error": str(error)}) + "\n")
+            if isinstance(error, ValueError) and "No coordinate data found" in str(error):
+                details = {
+                    "error": "The published document contains no coordinate data.",
+                    "expected": "A table with x-coordinate, Character, y-coordinate columns",
+                    "example": ["0 A 0", "1 B 0", "0 C 1"],
+                    "next_step": "Add coordinate rows to Google Docs and publish it again.",
+                }
+                _response(self, 422, json.dumps(details) + "\n")
+            else:
+                _response(self, 502, json.dumps({"error": str(error)}) + "\n")
             return
 
         _response(self, 200, result + "\n")
