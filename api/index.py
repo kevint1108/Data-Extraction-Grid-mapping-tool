@@ -4,6 +4,8 @@ import json
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, urlparse
 
+import requests
+
 from fetcher import load_html
 from grid import render
 from grid_parser import parse_html
@@ -62,6 +64,17 @@ class handler(BaseHTTPRequestHandler):
         try:
             grid = parse_html(load_html(source))
             result = render(grid, origin=origin, fill=fill)
+        except requests.HTTPError as error:
+            status = error.response.status_code if error.response is not None else 502
+            if status == 404:
+                message = (
+                    "Google Docs URL not found. Check that the document is published "
+                    "to the web and that the URL is complete.\n"
+                )
+                _response(self, 404, message)
+            else:
+                _response(self, 502, f"Unable to fetch source URL (HTTP {status}).\n")
+            return
         except Exception as error:
             _response(self, 502, json.dumps({"error": str(error)}) + "\n")
             return
