@@ -19,12 +19,35 @@ def _response(handler: BaseHTTPRequestHandler, status: int, body: str) -> None:
     handler.wfile.write(payload)
 
 
+def _form_response(handler: BaseHTTPRequestHandler) -> None:
+        body = """<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Grid Decoder</title></head>
+<body>
+    <h1>Grid Decoder</h1>
+    <form action="/api" method="get">
+        <label for="source">Published Google Docs URL</label>
+        <input id="source" name="source" type="url" required
+                     placeholder="https://docs.google.com/document/d/e/.../pub">
+        <button type="submit">Decode</button>
+    </form>
+</body>
+</html>
+"""
+        payload = body.encode("utf-8")
+        handler.send_response(200)
+        handler.send_header("Content-Type", "text/html; charset=utf-8")
+        handler.send_header("Content-Length", str(len(payload)))
+        handler.end_headers()
+        handler.wfile.write(payload)
+
+
 class handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         query = parse_qs(urlparse(self.path).query)
         source = query.get("source", [""])[0]
         if not source:
-            _response(self, 400, "Missing required query parameter: source\n")
+            _form_response(self)
             return
         if not source.startswith(("http://", "https://")):
             _response(self, 400, "source must be an HTTP or HTTPS URL\n")
